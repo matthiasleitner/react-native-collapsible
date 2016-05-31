@@ -42,7 +42,7 @@ class Collapsible extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      height: new Animated.Value(ALMOST_ZERO),
+      height: ALMOST_ZERO,
       contentHeight: 0,
       animating: false,
     };
@@ -50,45 +50,14 @@ class Collapsible extends Component {
 
   _toggleCollapsed(collapsed) {
     const height = collapsed ? ALMOST_ZERO : this.state.contentHeight;
-    const { duration } = this.props;
-    let easing = this.props.easing;
-    if (typeof easing === 'string') {
-      let prefix;
-      let found = false;
-      for (let i = 0; i < ANIMATED_EASING_PREFIXES.length; i++) {
-        prefix = ANIMATED_EASING_PREFIXES[i];
-        if (easing.substr(0, prefix.length) === prefix) {
-          easing = easing.substr(prefix.length, 1).toLowerCase() + easing.substr(prefix.length + 1);
-          prefix = prefix.substr(4, 1).toLowerCase() + prefix.substr(5);
-          easing = Easing[prefix](Easing[easing || 'ease']);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        easing = Easing[easing];
-      }
-      if (!easing) {
-        throw new Error('Invalid easing type "' + this.props.easing + '"');
-      }
-    }
-
-    if (this._animation) {
-      this._animation.stop();
-    }
-    this.setState({ animating: true });
-    this._animation = Animated.timing(this.state.height, {
-      toValue: height,
-      duration,
-      easing,
-    }).start(event => this.setState({ animating: false }));
+    this.setState({ height });
   }
 
   _handleLayoutChange(event) {
     const contentHeight = event.nativeEvent.layout.height;
     const height = this.props.collapsed ? ALMOST_ZERO : contentHeight;
     this.setState({
-      height: new Animated.Value(height),
+      height: height,
       contentHeight,
     });
   }
@@ -116,11 +85,11 @@ class Collapsible extends Component {
       }];
     }
     return (
-      <Animated.View style={style} pointerEvents={this.props.collapsed ? 'none' : 'auto'}>
-        <Animated.View style={[this.props.style, contentStyle]} onLayout={this.state.animating ? undefined : event => this._handleLayoutChange(event)}>
+      <View style={style} pointerEvents={this.props.collapsed ? 'none' : 'auto'}>
+        <View style={[this.props.style, contentStyle]} onLayout={this.state.animating ? undefined : event => this._handleLayoutChange(event)}>
           {this.props.children}
-        </Animated.View>
-      </Animated.View>
+        </View>
+      </View>
     );
   }
 }
