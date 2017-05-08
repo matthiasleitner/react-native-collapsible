@@ -95,7 +95,7 @@ class Collapsible extends Component {
   }
 
   _transitionToHeight(height) {
-    const height = collapsed ? ALMOST_ZERO : this.state.contentHeight;
+
     this.setState({ height, animating: false  });
   }
 
