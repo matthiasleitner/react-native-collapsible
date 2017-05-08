@@ -66,7 +66,7 @@ class Collapsible extends Component {
             measuring: false,
           }, () => callback(this.props.collapsedHeight));
         } else {
-          this.contentHandle.getNode().measure((x, y, width, height) => {
+          this.contentHandle.measure((x, y, width, height) => {
             this.setState({
               measuring: false,
               measured: true,
@@ -104,7 +104,7 @@ class Collapsible extends Component {
     if (this.state.animating || this.props.collapsed || this.state.measuring || this.state.contentHeight === contentHeight) {
       return;
     }
-    this.state.height.setValue(contentHeight);
+
     this.setState({ contentHeight });
   };
 
