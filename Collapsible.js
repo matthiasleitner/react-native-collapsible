@@ -11,13 +11,11 @@ import {
 
 const ANIMATED_EASING_PREFIXES = ['easeInOut', 'easeOut', 'easeIn'];
 
-// For some reason 0 heights won't hide overflow in RN 0.12+
-const ALMOST_ZERO = 0.00000001;
-
 class Collapsible extends Component {
   static propTypes = {
     align: PropTypes.oneOf(['top', 'center', 'bottom']),
     collapsed: PropTypes.bool,
+    collapsedHeight: PropTypes.number,
     duration: PropTypes.number,
     easing: PropTypes.oneOfType([
       PropTypes.string,
@@ -29,47 +27,101 @@ class Collapsible extends Component {
   static defaultProps = {
     align: 'top',
     collapsed: true,
+    collapsedHeight: 0,
     duration: 300,
     easing: 'easeOutCubic',
   };
 
-  componentWillReceiveProps(props) {
-    if (props.collapsed !== this.props.collapsed) {
-      this._toggleCollapsed(props.collapsed);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.collapsed !== this.props.collapsed) {
+      this._toggleCollapsed(nextProps.collapsed);
+    } else if (nextProps.collapsed && nextProps.collapsedHeight !== this.props.collapsedHeight) {
+      this.state.height.setValue(nextProps.collapsedHeight);
     }
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      height: ALMOST_ZERO,
+      measuring: false,
+      measured: false,
       contentHeight: 0,
       animating: false,
     };
   }
 
-  _toggleCollapsed(collapsed) {
-    const height = collapsed ? ALMOST_ZERO : this.state.contentHeight;
-    this.setState({ height });
+  contentHandle = null;
+
+  _handleRef = (ref) => {
+    this.contentHandle = ref;
   }
 
-  _handleLayoutChange(event) {
-    const contentHeight = event.nativeEvent.layout.height;
-    const height = this.props.collapsed ? ALMOST_ZERO : contentHeight;
+  _measureContent(callback) {
     this.setState({
-      height: height,
-      contentHeight,
+      measuring: true,
+    }, () => {
+      requestAnimationFrame(() => {
+        if (!this.contentHandle) {
+          this.setState({
+            measuring: false,
+          }, () => callback(this.props.collapsedHeight));
+        } else {
+          this.contentHandle.getNode().measure((x, y, width, height) => {
+            this.setState({
+              measuring: false,
+              measured: true,
+              contentHeight: height,
+            }, () => callback(height));
+          });
+        }
+      });
     });
   }
 
+  _toggleCollapsed(collapsed) {
+
+    if (collapsed) {
+      this._transitionToHeight(this.props.collapsedHeight)
+    } else if (!this.contentHandle) {
+      if (this.state.measured) {
+      this._transitionToHeight(this.state.contentHeight)
+      }
+      return;
+    } else {
+      this._measureContent(contentHeight => {
+        this._transitionToHeight(contentHeight);
+      })
+    }
+  }
+
+  _transitionToHeight(height) {
+    const height = collapsed ? ALMOST_ZERO : this.state.contentHeight;
+    this.setState({ height, animating: false  });
+  }
+
+  _handleLayoutChange = (event) => {
+    const contentHeight = event.nativeEvent.layout.height;
+    if (this.state.animating || this.props.collapsed || this.state.measuring || this.state.contentHeight === contentHeight) {
+      return;
+    }
+    this.state.height.setValue(contentHeight);
+    this.setState({ contentHeight });
+  };
+
+
   render() {
-    const { height, contentHeight } = this.state;
-    const style = {
+    const { collapsed } = this.props;
+    const { height, contentHeight, measuring, measured } = this.state;
+    const hasKnownHeight = !measuring && (measured || collapsed);
+    const style = hasKnownHeight && {
       overflow: 'hidden',
       height: height,
     };
-    let contentStyle = {};
-    if (this.props.align === 'center') {
+    const contentStyle = {};
+    if (measuring) {
+      contentStyle.position = 'absolute',
+      contentStyle.opacity = 0;
+    } else if (this.props.align === 'center') {
       contentStyle.transform = [{
         translateY: height.interpolate({
           inputRange: [0, contentHeight],
@@ -85,8 +137,15 @@ class Collapsible extends Component {
       }];
     }
     return (
-      <View style={style} pointerEvents={this.props.collapsed ? 'none' : 'auto'}>
-        <View style={[this.props.style, contentStyle]} onLayout={this.state.animating ? undefined : event => this._handleLayoutChange(event)}>
+      <View
+        style={style}
+        pointerEvents={collapsed ? 'none' : 'auto'}
+      >
+        <View
+          ref={this._handleRef}
+          style={[this.props.style, contentStyle]}
+          onLayout={this.state.animating ? undefined : this._handleLayoutChange}
+        >
           {this.props.children}
         </View>
       </View>

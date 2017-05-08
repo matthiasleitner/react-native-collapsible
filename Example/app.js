@@ -35,6 +35,21 @@ const CONTENT = [
   },
 ];
 
+const SELECTORS = [
+  {
+    title: 'First',
+    value: 0,
+  },
+  {
+    title: 'Third',
+    value: 2,
+  },
+  {
+    title: 'None',
+    value: false,
+  },
+];
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -57,7 +72,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   content: {
-    flex: 1,
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -67,17 +81,37 @@ const styles = StyleSheet.create({
   inactive: {
     backgroundColor: 'rgba(245,252,255,1)',
   },
+  selectors: {
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  selector: {
+    backgroundColor: '#F5FCFF',
+    padding: 10,
+  },
+  activeSelector: {
+    fontWeight: 'bold',
+  },
+  selectTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    padding: 10,
+  },
 });
 
 export default class ExampleView extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { collapsed: true };
-  }
+  state = {
+    activeSection: false,
+    collapsed: true,
+  };
 
   _toggleExpanded = () => {
     this.setState({ collapsed: !this.state.collapsed });
+  }
+
+  _setSection(section) {
+    this.setState({ activeSection: section });
   }
 
   _renderHeader(section, i, isActive) {
@@ -100,6 +134,20 @@ export default class ExampleView extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Accordion Example</Text>
+
+        <View style={styles.selectors}>
+          <Text style={styles.selectTitle}>Select:</Text>
+          {SELECTORS.map(selector => (
+            <TouchableHighlight key={selector.title} onPress={this._setSection.bind(this, selector.value)}>
+              <View style={styles.selector}>
+                <Text style={selector.value === this.state.activeSection && styles.activeSelector}>
+                  {selector.title}
+                </Text>
+              </View>
+            </TouchableHighlight>
+          ))}
+        </View>
+
         <TouchableHighlight onPress={this._toggleExpanded}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Single Collapsible</Text>
@@ -111,11 +159,14 @@ export default class ExampleView extends Component {
           </View>
         </Collapsible>
         <Accordion
+          activeSection={this.state.activeSection}
           sections={CONTENT}
           renderHeader={this._renderHeader}
           renderContent={this._renderContent}
           duration={400}
+          onChange={this._setSection.bind(this)}
         />
+
       </View>
     );
   }
