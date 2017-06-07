@@ -82,15 +82,8 @@ class Collapsible extends Component {
 
     if (collapsed) {
       this._transitionToHeight(this.props.collapsedHeight)
-    } else if (!this.contentHandle) {
-      if (this.state.measured) {
-      this._transitionToHeight(this.state.contentHeight)
-      }
-      return;
     } else {
-      this._measureContent(contentHeight => {
-        this._transitionToHeight(contentHeight);
-      })
+      this._transitionToHeight(null)
     }
   }
 
@@ -111,31 +104,13 @@ class Collapsible extends Component {
 
   render() {
     const { collapsed } = this.props;
-    const { height, contentHeight, measuring, measured } = this.state;
-    const hasKnownHeight = !measuring && (measured || collapsed);
-    const style = hasKnownHeight && {
+    const { height } = this.state;
+    const style = {
       overflow: 'hidden',
       height: height,
     };
     const contentStyle = {};
-    if (measuring) {
-      contentStyle.position = 'absolute',
-      contentStyle.opacity = 0;
-    } else if (this.props.align === 'center') {
-      contentStyle.transform = [{
-        translateY: height.interpolate({
-          inputRange: [0, contentHeight],
-          outputRange: [contentHeight / -2, 0],
-        }),
-      }];
-    } else if (this.props.align === 'bottom') {
-      contentStyle.transform = [{
-        translateY: height.interpolate({
-          inputRange: [0, contentHeight],
-          outputRange: [-contentHeight, 0],
-        }),
-      }];
-    }
+
     return (
       <View
         style={style}
