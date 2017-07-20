@@ -95,7 +95,7 @@ class Accordion extends Component {
                   data={this.props.sections}
                   removeClippedSubviews={true}
                   initialNumToRender={this.props.initialNumToRender}
-                  keyExtractor={(item, index) => index + '_' + this.state.activeSection !== index}/>
+                  keyExtractor={(item, index) => item.categoryID + '_' + this.state.activeSection !== index}/>
       </View>
     );
   }
