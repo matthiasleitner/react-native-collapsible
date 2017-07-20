@@ -1,11 +1,13 @@
 import React, {
   Component,
   PropTypes,
+
 } from 'react';
 
 import {
   View,
   TouchableHighlight,
+  FlatList
 } from 'react-native';
 
 import Collapsible from './Collapsible';
@@ -13,6 +15,7 @@ import Collapsible from './Collapsible';
 const COLLAPSIBLE_PROPS = Object.keys(Collapsible.propTypes);
 const VIEW_PROPS = Object.keys(View.propTypes);
 
+const collapsibleProps = {}
 class Accordion extends Component {
   static propTypes = {
     sections: PropTypes.array.isRequired,
@@ -62,9 +65,22 @@ class Accordion extends Component {
     }
   }
 
+  renderItem({item, index}){
+    return (
+      <View key={index}>
+        <TouchableHighlight onPress={() => this._toggleSection(index)} underlayColor={this.props.underlayColor}>
+          {this.props.renderHeader(item, index, this.state.activeSection === index)}
+        </TouchableHighlight>
+        <Collapsible collapsed={this.state.activeSection !== index} {...collapsibleProps}>
+          {this.props.renderContent(item, index, this.state.activeSection === index)}
+        </Collapsible>
+      </View>
+    )
+  }
+
   render() {
     let viewProps = {};
-    let collapsibleProps = {};
+    collapsibleProps = {}
     Object.keys(this.props).forEach((key) => {
       if (COLLAPSIBLE_PROPS.indexOf(key) !== -1) {
         collapsibleProps[key] = this.props[key];
@@ -75,16 +91,7 @@ class Accordion extends Component {
 
     return (
       <View {...viewProps}>
-      {this.props.sections.map((section, key) => (
-        <View key={key}>
-          <TouchableHighlight onPress={() => this._toggleSection(key)} underlayColor={this.props.underlayColor}>
-            {this.props.renderHeader(section, key, this.state.activeSection === key)}
-          </TouchableHighlight>
-          <Collapsible collapsed={this.state.activeSection !== key} {...collapsibleProps}>
-            {this.props.renderContent(section, key, this.state.activeSection === key)}
-          </Collapsible>
-        </View>
-      ))}
+        <FlatList renderItem={this.renderItem.bind(this)} data={this.props.sections}/>
       </View>
     );
   }
