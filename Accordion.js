@@ -92,7 +92,7 @@ class Accordion extends Component {
     return (
         <FlatList renderItem={this.renderItem.bind(this)}
                   data={this.props.sections}
-                  removeClippedSubviews={true}
+                  removeClippedSubviews={false}
                   extraData={this.props.extraData}
                   initialNumToRender={this.props.initialNumToRender}
                   keyExtractor={this.props.keyExtractor}
