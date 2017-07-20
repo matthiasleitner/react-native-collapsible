@@ -94,7 +94,7 @@ class Accordion extends Component {
         <FlatList renderItem={this.renderItem.bind(this)}
                   data={this.props.sections}
                   initialNumToRender={this.props.initialNumToRender}
-                  keyExtractor={({item}) => item.categoryID}/>
+                  keyExtractor={(item, index) => index}/>
       </View>
     );
   }
