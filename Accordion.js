@@ -6,13 +6,14 @@ import React, {
 import {
   View,
   TouchableHighlight,
-  FlatList
+  FlatList,
+  ViewPropTypes
 } from 'react-native';
 
 import Collapsible from './Collapsible';
 
 const COLLAPSIBLE_PROPS = Object.keys(Collapsible.propTypes);
-const VIEW_PROPS = Object.keys(View.propTypes);
+const VIEW_PROPS = Object.keys(ViewPropTypes);
 
 const collapsibleProps = {}
 class Accordion extends Component {
