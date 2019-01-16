@@ -15,7 +15,7 @@ import Collapsible from './Collapsible';
 const COLLAPSIBLE_PROPS = Object.keys(Collapsible.propTypes);
 const VIEW_PROPS = Object.keys(ViewPropTypes);
 
-const collapsibleProps = {}
+let collapsibleProps = {}
 class Accordion extends Component {
   static propTypes = {
     sections: PropTypes.array.isRequired,
