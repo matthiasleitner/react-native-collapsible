@@ -44,6 +44,8 @@ class Accordion extends Component {
     this.state = {
       activeSection: props.activeSection !== undefined ? props.activeSection : props.initiallyActiveSection,
     };
+
+    this.renderItem = this.renderItem.bind(this)
   }
 
   _toggleSection(section) {
@@ -90,13 +92,13 @@ class Accordion extends Component {
     });
 
     return (
-        <FlatList renderItem={this.renderItem.bind(this)}
-                  data={this.props.sections}
-                  removeClippedSubviews={false}
-                  extraData={this.props.extraData}
-                  initialNumToRender={this.props.initialNumToRender}
-                  keyExtractor={this.props.keyExtractor}
-                  {...viewProps}/>
+      <FlatList renderItem={this.renderItem}
+                data={this.props.sections}
+                removeClippedSubviews={false}
+                extraData={this.props.extraData}
+                initialNumToRender={this.props.initialNumToRender}
+                keyExtractor={this.props.keyExtractor}
+                {...viewProps}/>
     );
   }
 }
