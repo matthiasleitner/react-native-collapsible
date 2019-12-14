@@ -35,6 +35,7 @@ class Accordion extends Component {
 
   static defaultProps = {
     underlayColor: 'black',
+    expandAll: false,
   };
 
   constructor(props) {
@@ -73,7 +74,7 @@ class Accordion extends Component {
         <TouchableHighlight onPress={() => this._toggleSection(index)} underlayColor={this.props.underlayColor}>
           {this.props.renderHeader(item, index, this.state.activeSection === index)}
         </TouchableHighlight>
-        <Collapsible collapsed={this.state.activeSection !== index} {...collapsibleProps}>
+        <Collapsible collapsed={this.props.exandAll ? false : this.state.activeSection !== index} {...collapsibleProps}>
           {this.props.renderContent(item, index, this.state.activeSection === index)}
         </Collapsible>
       </View>
@@ -95,6 +96,8 @@ class Accordion extends Component {
       <FlatList renderItem={this.renderItem}
                 data={this.props.sections}
                 removeClippedSubviews={false}
+                ListHeaderComponent={this.props.ListHeaderComponent}
+                ListFooterComponent={this.props.ListFooterComponent}
                 extraData={this.props.extraData}
                 initialNumToRender={this.props.initialNumToRender}
                 keyExtractor={this.props.keyExtractor}
