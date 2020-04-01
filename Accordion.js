@@ -96,6 +96,7 @@ class Accordion extends Component {
       <FlatList renderItem={this.renderItem}
                 data={this.props.sections}
                 removeClippedSubviews={false}
+                ref={(ref) => { this.listViewRef = ref; }}
                 ListHeaderComponent={this.props.ListHeaderComponent}
                 ListFooterComponent={this.props.ListFooterComponent}
                 extraData={this.props.extraData}
