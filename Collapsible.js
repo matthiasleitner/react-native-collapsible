@@ -33,7 +33,7 @@ class Collapsible extends Component {
     easing: 'easeOutCubic',
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.collapsed !== this.props.collapsed) {
       this._toggleCollapsed(nextProps.collapsed);
     } else if (nextProps.collapsed && nextProps.collapsedHeight !== this.props.collapsedHeight) {
